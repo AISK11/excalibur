@@ -18,7 +18,7 @@
 1. Compile Excalibur from source:
     ```sh
     git clone --depth 1 'https://gitlab.com/AISK11/excalibur/' /opt/excalibur/
-    cd /opt/excalibur/ && make linux
+    cd /opt/excalibur/ && make
     ```
 1. Link to system location:
     ```sh
