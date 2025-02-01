@@ -1,5 +1,55 @@
+#include "basics.h"
+#include "lnk.h"
 #include <sys/stat.h>
-#include "utils.h"
+#include <stdbool.h>
+
+/* (FREE) Dump file in hexadecimal format. */
+char *od(FILE *file){
+    /* Get file size. */
+    fseek(file, 0, SEEK_END);
+    long size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    /* Double file size: 0x00 -> '0' (0x30) + '0' (0x30). */
+    size *= 2;
+
+    /* Allocate memory for file content + null byte. */
+    char *content = (char *)malloc(size + 1);
+
+    /* Read file char by char. */
+    char *hexdigits = "0123456789abcdef";
+    unsigned long long n = 0;
+    int c;
+    while ((c = fgetc(file)) != EOF) {
+        /* Convert char '\0' (0x00) to two chars: '0' (0x30) + '0' (0x30). */
+        content[n++] = hexdigits[(c >> 4) & 0xF];
+        content[n++] = hexdigits[c & 0xF];
+    }
+    content[n] = '\0';
+
+    /* Allow file re-read. */
+    rewind(file);
+
+    /* Return content as hex string. */
+    return content;
+}
+
+
+bool is_valid_file(char *path, FILE *file) {
+    /* File could not be read. */
+    if (file == NULL) {
+        return false;
+    }
+
+    /* File is not regular file. */
+    struct stat path_stat;
+    stat(path, &path_stat);
+    if (!(S_ISREG(path_stat.st_mode))) {
+        return false;
+    }
+    return true;
+}
+
 
 int main(int argc, char *argv[]) {
     /* CLI arguments. */
@@ -9,48 +59,22 @@ int main(int argc, char *argv[]) {
     char *path = argv[1];
 
     /* Open file in read-only binary mode. */
-    FILE *f = fopen(path, "rb");
-    if (f == NULL) {
-        return 2;
-    }
-
-    /* Check if file is regular file or symbolic link. */
-    struct stat path_stat;
-    stat(path, &path_stat);
-    if (!(S_ISREG(path_stat.st_mode))) {
+    FILE *file = fopen(path, "rb");
+    if (!is_valid_file(path, file)) {
         return 2;
     }
 
     /* Basic analysis. */
-    char *name = basename(path);
-    printf("   Name: %s\n", name);
-    unsigned long long size = wc(f);
-    char *size_SI = size2human(size, SIZE_SI);
-    char *size_IEC = size2human(size, SIZE_IEC);
-    printf("   Size: %llu B (%s = %s)\n", size, size_SI, size_IEC);
-    free(size_SI);
-    free(size_IEC);
-    long double entropy = ent(f);
-    printf("Entropy: %.6Lf (%.0Lf%%)\n", entropy, entropy * 100 / 8);
-    char *md5 = md5sum(f);
-    printf("    MD5: %s\n", md5);
-    free(md5);
-    char *sha1 = sha1sum(f);
-    printf("  SHA-1: %s\n", sha1);
-    free(sha1);
-    char *sha256 = sha256sum(f);
-    printf("SHA-256: %s\n", sha256);
-    free(sha256);
+    basic_analysis(path, file);
 
     /* Filetype analysis. */
-    char *hexdump = od(f);
+    char *hexdump = od(file);
     if (strncmp(hexdump, "4c000000", 8) == 0) {
         puts("   Type: LNK");
+        analyze_lnk(hexdump);
     } else {
         puts("   Type: ???");
     }
-
-    //printf("DEBUG: %s\n", hexdump);
     free(hexdump);
 
     /* Exit. */

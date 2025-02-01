@@ -1,5 +1,5 @@
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef BASICS_H
+#define BASICS_H
 
 #include <math.h>                         /* std -lm    */
 #include <stdint.h>                       /* std        */
@@ -16,14 +16,17 @@
 /* Strip directory and suffix from file path. */
 char *basename(char *path);
 
+/* Count file size in bytes. */
+unsigned long long wc(FILE *file);
+
+/* (FREE) Show size in user-friendly way. */
+char *size2human(unsigned long long size, unsigned short base);
+
 /* Calculate file entropy. */
 long double ent(FILE *file);
 
 /* (FREE) Compute MD5 file digest. */
 char *md5sum(FILE *file);
-
-/* (FREE) Dump file in hexadecimal format. */
-char *od(FILE *file);
 
 /* (FREE) Compute SHA-1 file digest. */
 char *sha1sum(FILE *file);
@@ -31,10 +34,7 @@ char *sha1sum(FILE *file);
 /* (FREE) Compute SHA-256 file digest. */
 char *sha256sum(FILE *file);
 
-/* (FREE) Show size in user-friendly way. */
-char *size2human(unsigned long long size, unsigned short base);
-
-/* Count file size in bytes. */
-unsigned long long wc(FILE *file);
+/* Display basic analysis. */
+void basic_analysis(char *path, FILE *file);
 
 #endif

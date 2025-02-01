@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "basics.h"
 
 /* Strip directory and suffix from file path. */
 char *basename(char *path) {
@@ -14,6 +14,83 @@ char *basename(char *path) {
         return strdup(path);
     }
     return strdup(delimeter + 1);
+}
+
+
+/* Count file size in bytes. */
+unsigned long long wc(FILE *file) {
+    /* Get file size. */
+    fseek(file, 0, SEEK_END);
+    long size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    /* Return size in bytes. */
+    return size;
+}
+
+
+/* (FREE) Show size in user-friendly way. */
+char *size2human(unsigned long long size, unsigned short base) {
+    /* Size string, max value: '123.56 kiB' (10 + null byte). */
+    char *s = (char *)malloc(11);
+
+    /* Calculate human readable size. */
+    long double size_h = size;
+    unsigned char count = 0;
+    do {
+        size_h /= base;
+        count++;
+    }
+    while (size_h >= base);
+
+    /* Convert double and add value to string. */
+    sprintf(s, "%.2Lf", size_h);
+
+    /* Append unit to string. */
+    size_t s_length = strlen(s);
+    s[s_length++] = ' ';
+    switch (count) {
+        case 1:
+            s[s_length++] = 'k';
+            break;
+        case 2:
+            s[s_length++] = 'M';
+            break;
+        case 3:
+            s[s_length++] = 'G';
+            break;
+        case 4:
+            s[s_length++] = 'T';
+            break;
+        case 5:
+            s[s_length++] = 'P';
+            break;
+        case 6:
+            s[s_length++] = 'E';
+            break;
+        case 7:
+            s[s_length++] = 'Z';
+            break;
+        case 8:
+            s[s_length++] = 'Y';
+            break;
+        case 9:
+            s[s_length++] = 'R';
+            break;
+        case 10:
+            s[s_length++] = 'Q';
+            break;
+        default:
+            s[s_length++] = '?';
+    }
+    if (base == SIZE_IEC) {
+        s[s_length++] = 'i';
+    }
+    s[s_length++] = 'B';
+    s[s_length] = '\0';
+
+    /* Return human readable size string. */
+    return s;
 }
 
 
@@ -85,103 +162,6 @@ char *md5sum(FILE *file) {
 }
 
 
-/* (FREE) Dump file in hexadecimal format. */
-char *od(FILE *file){
-    /* Get file size. */
-    fseek(file, 0, SEEK_END);
-    long size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    /* Double file size: 0x00 -> '0' (0x30) + '0' (0x30). */
-    size *= 2;
-
-    /* Allocate memory for file content + null byte. */
-    char *content = (char *)malloc(size + 1);
-
-    /* Read file char by char. */
-    char *hexdigits = "0123456789abcdef";
-    unsigned long long n = 0;
-    int c;
-    while ((c = fgetc(file)) != EOF) {
-        /* Convert char '\0' (0x00) to two chars: '0' (0x30) + '0' (0x30). */
-        content[n++] = hexdigits[(c >> 4) & 0xF];
-        content[n++] = hexdigits[c & 0xF];
-    }
-    content[n] = '\0';
-
-    /* Allow file re-read. */
-    rewind(file);
-
-    /* Return content as hex string. */
-    return content;
-}
-
-
-/* (FREE) Show size in user-friendly way. */
-char *size2human(unsigned long long size, unsigned short base) {
-    /* Size string, max value: '123.56 kiB' (10 + null byte). */
-    char *s = (char *)malloc(11);
-
-    /* Calculate human readable size. */
-    long double size_h = size;
-    unsigned char count = 0;
-    do {
-        size_h /= base;
-        count++;
-    }
-    while (size_h >= base);
-
-    /* Convert double and add value to string. */
-    sprintf(s, "%.2Lf", size_h);
-
-    /* Append unit to string. */
-    size_t s_length = strlen(s);
-    s[s_length++] = ' ';
-    switch (count) {
-        case 1:
-            s[s_length++] = 'k';
-            break;
-        case 2:
-            s[s_length++] = 'M';
-            break;
-        case 3:
-            s[s_length++] = 'G';
-            break;
-        case 4:
-            s[s_length++] = 'T';
-            break;
-        case 5:
-            s[s_length++] = 'P';
-            break;
-        case 6:
-            s[s_length++] = 'E';
-            break;
-        case 7:
-            s[s_length++] = 'Z';
-            break;
-        case 8:
-            s[s_length++] = 'Y';
-            break;
-        case 9:
-            s[s_length++] = 'R';
-            break;
-        case 10:
-            s[s_length++] = 'Q';
-            break;
-        default:
-            s[s_length++] = '?';
-    }
-    if (base == SIZE_IEC) {
-        s[s_length++] = 'i';
-    }
-    s[s_length++] = 'B';
-    s[s_length] = '\0';
-
-    /* Return human readable size string. */
-    return s;
-}
-
-
 /* (FREE) Compute SHA-1 file digest. */
 char *sha1sum(FILE *file) {
     /* SHA-1 hash size = 20 bytes. */
@@ -246,13 +226,25 @@ char *sha256sum(FILE *file) {
 }
 
 
-/* Count file size in bytes. */
-unsigned long long wc(FILE *file) {
-    /* Get file size. */
-    fseek(file, 0, SEEK_END);
-    long size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    /* Return size in bytes. */
-    return size;
+/* Display basic analysis. */
+void basic_analysis(char *path, FILE *file) {
+    char *name = basename(path);
+    printf("   Name: %s\n", name);
+    unsigned long long size = wc(file);
+    char *size_SI = size2human(size, SIZE_SI);
+    char *size_IEC = size2human(size, SIZE_IEC);
+    printf("   Size: %llu B (%s = %s)\n", size, size_SI, size_IEC);
+    free(size_SI);
+    free(size_IEC);
+    long double entropy = ent(file);
+    printf("Entropy: %.6Lf (%.0Lf%%)\n", entropy, entropy * 100 / 8);
+    char *md5 = md5sum(file);
+    printf("    MD5: %s\n", md5);
+    free(md5);
+    char *sha1 = sha1sum(file);
+    printf("  SHA-1: %s\n", sha1);
+    free(sha1);
+    char *sha256 = sha256sum(file);
+    printf("SHA-256: %s\n", sha256);
+    free(sha256);
 }
