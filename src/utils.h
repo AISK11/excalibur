@@ -19,9 +19,6 @@ char *basename(char *path);
 /* Calculate file entropy. */
 long double ent(FILE *file);
 
-/* Detect filetype. */
-//unsigned short file(char *base16);
-
 /* (FREE) Compute MD5 file digest. */
 char *md5sum(FILE *file);
 

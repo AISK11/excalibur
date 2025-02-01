@@ -23,24 +23,35 @@ int main(int argc, char *argv[]) {
 
     /* Basic analysis. */
     char *name = basename(path);
+    printf("   Name: %s\n", name);
     unsigned long long size = wc(f);
     char *size_SI = size2human(size, SIZE_SI);
     char *size_IEC = size2human(size, SIZE_IEC);
-    long double entropy = ent(f);
-    char *md5 = md5sum(f);
-    char *sha1 = sha1sum(f);
-    char *sha256 = sha256sum(f);
-    printf("   Name: %s\n", name);
     printf("   Size: %llu B (%s = %s)\n", size, size_SI, size_IEC);
-    printf("Entropy: %.6Lf (%.0Lf%%)\n", entropy, entropy * 100 / 8);
-    printf("    MD5: %s\n", md5);
-    printf("  SHA-1: %s\n", sha1);
-    printf("SHA-256: %s\n", sha256);
     free(size_SI);
     free(size_IEC);
+    long double entropy = ent(f);
+    printf("Entropy: %.6Lf (%.0Lf%%)\n", entropy, entropy * 100 / 8);
+    char *md5 = md5sum(f);
+    printf("    MD5: %s\n", md5);
     free(md5);
+    char *sha1 = sha1sum(f);
+    printf("  SHA-1: %s\n", sha1);
     free(sha1);
+    char *sha256 = sha256sum(f);
+    printf("SHA-256: %s\n", sha256);
     free(sha256);
+
+    /* Filetype analysis. */
+    char *hexdump = od(f);
+    if (strncmp(hexdump, "4c000000", 8) == 0) {
+        puts("   Type: LNK");
+    } else {
+        puts("   Type: ???");
+    }
+
+    //printf("DEBUG: %s\n", hexdump);
+    free(hexdump);
 
     /* Exit. */
     return 0;

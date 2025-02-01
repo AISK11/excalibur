@@ -53,23 +53,6 @@ long double ent(FILE *file) {
 }
 
 
-/* Detect filetype. */
-//unsigned short file(char *base16) {
-//    /* Set default filetype (0 = Unknown). */
-//    unsigned short int type = 0;
-//
-//    /* Magic bytes (4 * 2 + null byte). */
-//    char magic[9];
-//    strncpy(magic, base16, 8);
-//
-//    /* Detect filetype. */
-//    if (strcmp(magic, "4c000000") == 0) {
-//        type = 1; /* LNK */
-//    }
-//    return type;
-//}
-
-
 /* (FREE) Compute MD5 file digest. */
 char *md5sum(FILE *file) {
     /* MD5 hash size = 16 bytes. */
