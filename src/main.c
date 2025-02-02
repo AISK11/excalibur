@@ -22,19 +22,19 @@ void help() {
 
 int main(int argc, char *argv[]) {
     /* Default options. */
-    bool only_dump = false;  /* -d */
-    bool only_basic = false; /* -b */
+    bool opt_b = false; /* -b */
+    bool opt_d = false; /* -d */
 
     /* CLI option parser. */
-    int opt;
     char *path = "";
+    int opt;
     while ((opt = getopt(argc, argv, "-:bdh")) != -1) {
         switch (opt) {
             case 'b':
-                only_basic = true;
+                opt_b = true;
                 break;
             case 'd':
-                only_dump = true;
+                opt_d = true;
                 break;
             case 'h':
                 help();
@@ -63,10 +63,10 @@ int main(int argc, char *argv[]) {
     }
 
     /* Process passed options. */
-    if (only_basic) {
+    if (opt_b) {
         report_basic(path, file);
         return 0;
-    } else if (only_dump) {
+    } else if (opt_d) {
         printf("%s\n", od(file));
         return 0;
     }
