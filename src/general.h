@@ -1,5 +1,5 @@
-#ifndef BASICS_H
-#define BASICS_H
+#ifndef GENERAL_H
+#define GENERAL_H
 
 #include <math.h>                         /* std -lm    */
 #include <stdint.h>                       /* std        */
@@ -35,6 +35,6 @@ char *sha1sum(FILE *file);
 char *sha256sum(FILE *file);
 
 /* Display basic analysis. */
-void basic_analysis(char *path, FILE *file);
+void general(char *path, FILE *file);
 
 #endif

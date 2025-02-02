@@ -1,4 +1,4 @@
-#include "basics.h"
+#include "general.h"
 
 /* Strip directory and suffix from file path. */
 char *basename(char *path) {
@@ -227,7 +227,7 @@ char *sha256sum(FILE *file) {
 
 
 /* Display basic analysis. */
-void basic_analysis(char *path, FILE *file) {
+void general(char *path, FILE *file) {
     char *name = basename(path);
     printf("   Name: %s\n", name);
     unsigned long long size = wc(file);

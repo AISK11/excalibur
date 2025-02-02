@@ -1,4 +1,4 @@
-#include "basics.h"
+#include "general.h"
 #include "lnk.h"
 #include <sys/stat.h>
 #include <stdbool.h>
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* Basic analysis. */
-    basic_analysis(path, file);
+    general(path, file);
 
     /* Filetype analysis. */
     char *hexdump = od(file);
