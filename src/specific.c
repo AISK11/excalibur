@@ -1,7 +1,8 @@
 #include "specific.h"
+#include "files/lnk.h"
 
 /* (FREE) Dump file in hexadecimal format. */
-char *od(FILE *file){
+char *hd(FILE *file){
     /* Get file size. */
     fseek(file, 0, SEEK_END);
     long size = ftell(file);
@@ -32,24 +33,23 @@ char *od(FILE *file){
 }
 
 
-/* Detect filetype. */
-unsigned short idfile(char *hexdump) {
-    if (strncmp(hexdump, "4c000000", 8) == 0) {
-        return 1; /* LNK */
-    } else {
-        return 0; /* ??? */
-    }
-}
-
-
 /* Display specific analysis report. */
 void report_specific(FILE *file) {
     /* Read file content. */
-    char *hexdump = od(file);
+    char *hexdump = hd(file);
 
-    /* Detect fieltype ID. */
-    unsigned short file_id = idfile(hexdump);
-    printf("ID: %hu\n", file_id);
+    /* File signature. */
+    char magic[9];
+    strncpy(magic, hexdump, 8);
+    magic[8] = '\0';
 
+    /* Print filetype. */
+    printf("   Type: ");
+    if (strncmp(magic, "4c000000", 8) == 0) {
+        printf("%s (%s)\n", "LNK", magic);
+        lnk(hexdump);
+    } else {
+        printf("%s (%s)\n", "???", magic);
+    }
     free(hexdump);
 }

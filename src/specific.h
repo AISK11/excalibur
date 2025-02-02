@@ -6,10 +6,7 @@
 #include <string.h>
 
 /* (FREE) Dump file in hexadecimal format. */
-char *od(FILE *file);
-
-/* Detect filetype. */
-unsigned short idfile(char *base16);
+char *hd(FILE *file);
 
 /* Display specific analysis report. */
 void report_specific(FILE *file);

@@ -3,6 +3,6 @@
 
 #include <stdio.h>
 
-void analyze_lnk(char *base16);
+void lnk(char *hexdump);
 
 #endif
