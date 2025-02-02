@@ -1,81 +1,79 @@
-#include "general.h"
-#include "lnk.h"
-#include <sys/stat.h>
+#include "basic.h"
+#include "specific.h"
+#include <getopt.h>
 #include <stdbool.h>
+#include <sys/stat.h>
 
-/* (FREE) Dump file in hexadecimal format. */
-char *od(FILE *file){
-    /* Get file size. */
-    fseek(file, 0, SEEK_END);
-    long size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    /* Double file size: 0x00 -> '0' (0x30) + '0' (0x30). */
-    size *= 2;
-
-    /* Allocate memory for file content + null byte. */
-    char *content = (char *)malloc(size + 1);
-
-    /* Read file char by char. */
-    char *hexdigits = "0123456789abcdef";
-    unsigned long long n = 0;
-    int c;
-    while ((c = fgetc(file)) != EOF) {
-        /* Convert char '\0' (0x00) to two chars: '0' (0x30) + '0' (0x30). */
-        content[n++] = hexdigits[(c >> 4) & 0xF];
-        content[n++] = hexdigits[c & 0xF];
-    }
-    content[n] = '\0';
-
-    /* Allow file re-read. */
-    rewind(file);
-
-    /* Return content as hex string. */
-    return content;
-}
-
-
-bool is_valid_file(char *path, FILE *file) {
-    /* File could not be read. */
-    if (file == NULL) {
-        return false;
-    }
-
-    /* File is not regular file. */
-    struct stat path_stat;
-    stat(path, &path_stat);
-    if (!(S_ISREG(path_stat.st_mode))) {
-        return false;
-    }
-    return true;
+void help() {
+    puts("NAME");
+    puts("    excalibur - malware analyzer");
+    puts("\nSYNOPSIS");
+    puts("    excalibur [-bdh] <FILE>");
+    puts("\nDESCRIPTION");
+    puts("    -b    Only perform basic analysis.");
+    puts("    -d    Only dump file content in base16.");
+    puts("    -h    Only show this help message.");
+    puts("\nEXIT STATUS");
+    puts("    0    success");
+    puts("    1    error (option)");
+    puts("    2    error (file)");
 }
 
 
 int main(int argc, char *argv[]) {
-    /* CLI arguments. */
-    if (argc != 2) {
-        return 1;
-    }
-    char *path = argv[1];
+    /* Default options. */
+    bool only_dump = false;  /* -d */
+    bool only_basic = false; /* -b */
 
-    /* Open file in read-only binary mode. */
+    /* CLI option parser. */
+    int opt;
+    char *path = "";
+    while ((opt = getopt(argc, argv, "-:bdh")) != -1) {
+        switch (opt) {
+            case 'b':
+                only_basic = true;
+                break;
+            case 'd':
+                only_dump = true;
+                break;
+            case 'h':
+                help();
+                return 0;
+            case '?':
+                return 1;
+                break;
+            case ':':
+                return 1;
+                break;
+            case 1:
+                path = optarg;
+                break;
+        }
+    }
+
+    /* Open regular file in read-only binary mode. */
     FILE *file = fopen(path, "rb");
-    if (!is_valid_file(path, file)) {
+    if (file == NULL) {
+        return 2;
+    }
+    struct stat path_stat;
+    stat(path, &path_stat);
+    if (!(S_ISREG(path_stat.st_mode))) {
         return 2;
     }
 
-    /* Basic analysis. */
-    general(path, file);
-
-    /* Filetype analysis. */
-    char *hexdump = od(file);
-    if (strncmp(hexdump, "4c000000", 8) == 0) {
-        puts("   Type: LNK");
-        analyze_lnk(hexdump);
-    } else {
-        puts("   Type: ???");
+    /* Process passed options. */
+    if (only_basic) {
+        report_basic(path, file);
+        return 0;
+    } else if (only_dump) {
+        printf("%s\n", od(file));
+        return 0;
     }
-    free(hexdump);
+
+    /* Analysis. */
+    report_basic(path, file);
+    //report_specific(file);
 
     /* Exit. */
     return 0;
