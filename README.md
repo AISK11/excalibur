@@ -2,10 +2,6 @@
 
 *- static malware analyzer.*
 
-## About
-
-## Installation
-
 ## Compilation (Manual Installation)
 
 ### Linux
@@ -23,11 +19,4 @@
 1. Link to system location:
     ```sh
     ln -s -f /opt/excalibur/bin/excalibur /usr/local/bin/excalibur
-    ```
-
-## Usage
-
-1. Analyze file:
-    ```sh
-    excalibur <FILE>
     ```
