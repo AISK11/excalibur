@@ -33,4 +33,7 @@ char *sha1sum(FILE *file);
 /* (FREE) Compute SHA-256 file digest. */
 char *sha256sum(FILE *file);
 
+/* (FREE) Dump file in hexadecimal (base16) format. */
+char *base16(FILE *file);
+
 #endif

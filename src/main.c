@@ -1,14 +1,12 @@
 #include "utils.h"
-#include "specific.h"
 #include <getopt.h>
-#include <stdbool.h>
 #include <sys/stat.h>
 
 void help() {
     puts("NAME");
     puts("    excalibur - malware analyzer");
     puts("\nSYNOPSIS");
-    puts("    excalibur [-bh] <FILE>");
+    puts("    excalibur [-bh] FILE");
     puts("\nDESCRIPTION");
     puts("    -b    Only perform basic analysis.");
     puts("    -h    Only show this help message.");
@@ -19,7 +17,7 @@ void help() {
 }
 
 
-/* Display basic analysis report. */
+/* Display basic analysis. */
 void report_basic(char *path, FILE *file) {
     char *name = basename(path);
     printf("   Name: %s\n", name);
@@ -45,7 +43,7 @@ void report_basic(char *path, FILE *file) {
 
 int main(int argc, char *argv[]) {
     /* Default options. */
-    bool opt_b = false; /* -b */
+    unsigned char opt_b = 0;
 
     /* CLI option parser. */
     char *path = "";
@@ -53,7 +51,7 @@ int main(int argc, char *argv[]) {
     while ((opt = getopt(argc, argv, "-:bh")) != -1) {
         switch (opt) {
             case 'b':
-                opt_b = true;
+                opt_b = 1;
                 break;
             case 'h':
                 help();
@@ -83,10 +81,9 @@ int main(int argc, char *argv[]) {
 
     /* Process passed options. */
     report_basic(path, file);
-    if (opt_b) {
-        return 0;
+    if (!opt_b) {
+        //report_specific(file);
     }
-    report_specific(file);
 
     /* Exit. */
     return 0;

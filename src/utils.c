@@ -43,7 +43,7 @@ char *size2human(unsigned long long size, unsigned short base) {
     }
     while (size_h >= base);
 
-    /* Convert double and add value to string. */
+    /* Convert long double and add value to string. */
     sprintf(s, "%.2Lf", size_h);
 
     /* Append unit to string. */
@@ -223,4 +223,36 @@ char *sha256sum(FILE *file) {
 
     /* Return hash string. */
     return hash;
+}
+
+
+/* (FREE) Dump file in hexadecimal (base16) format. */
+char *base16(FILE *file){
+    /* Get file size. */
+    fseek(file, 0, SEEK_END);
+    long size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    /* Double file size: 0x00 -> '0' (0x30) + '0' (0x30). */
+    size *= 2;
+
+    /* Allocate memory for file content + null byte. */
+    char *content = (char *)malloc(size + 1);
+
+    /* Read file char by char. */
+    char *hexdigits = "0123456789abcdef";
+    unsigned long long n = 0;
+    int c;
+    while ((c = fgetc(file)) != EOF) {
+        /* Convert char '\0' (0x00) to two chars: '0' (0x30) + '0' (0x30). */
+        content[n++] = hexdigits[(c >> 4) & 0xF];
+        content[n++] = hexdigits[c & 0xF];
+    }
+    content[n] = '\0';
+
+    /* Allow file re-read. */
+    rewind(file);
+
+    /* Return content as hex string. */
+    return content;
 }
