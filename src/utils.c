@@ -1,4 +1,4 @@
-#include "basic.h"
+#include "utils.h"
 
 /* Strip directory and suffix from file path. */
 char *basename(char *path) {
@@ -223,28 +223,4 @@ char *sha256sum(FILE *file) {
 
     /* Return hash string. */
     return hash;
-}
-
-
-/* Display basic analysis report. */
-void report_basic(char *path, FILE *file) {
-    char *name = basename(path);
-    printf("   Name: %s\n", name);
-    unsigned long long size = wc(file);
-    char *size_SI = size2human(size, SIZE_SI);
-    char *size_IEC = size2human(size, SIZE_IEC);
-    printf("   Size: %llu B (%s = %s)\n", size, size_SI, size_IEC);
-    free(size_SI);
-    free(size_IEC);
-    long double entropy = ent(file);
-    printf("Entropy: %.6Lf (%.0Lf%%)\n", entropy, entropy * 100 / 8);
-    char *md5 = md5sum(file);
-    printf("    MD5: %s\n", md5);
-    free(md5);
-    char *sha1 = sha1sum(file);
-    printf("  SHA-1: %s\n", sha1);
-    free(sha1);
-    char *sha256 = sha256sum(file);
-    printf("SHA-256: %s\n", sha256);
-    free(sha256);
 }

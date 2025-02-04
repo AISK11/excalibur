@@ -1,6 +1,6 @@
 # Excalibur
 
-*- malware analyzer.*
+*- static malware analyzer.*
 
 ## About
 

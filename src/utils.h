@@ -1,8 +1,7 @@
-#ifndef BASIC_H
-#define BASIC_H
+#ifndef UTILS_H
+#define UTILS_H
 
 #include <math.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,8 +32,5 @@ char *sha1sum(FILE *file);
 
 /* (FREE) Compute SHA-256 file digest. */
 char *sha256sum(FILE *file);
-
-/* Display basic analysis report. */
-void report_basic(char *path, FILE *file);
 
 #endif
