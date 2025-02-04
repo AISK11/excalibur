@@ -41,6 +41,24 @@ void report_basic(char *path, FILE *file) {
 }
 
 
+/* Display specific analysis. */
+void report_specific(FILE *file) {
+    /* Print filetype. */
+    char magic[9];
+    strncpy(magic, base16(file), 8);
+    magic[8] = '\0';
+    char filetype[4];
+
+    /* Print filetype. */
+    if (strncmp(magic, "4c000000", 8) == 0) {
+        strncpy(filetype, "LNK\0", 4);
+    } else {
+        strncpy(filetype, "???\0", 4);
+    }
+    printf("   Type: %s (%s)\n", filetype, magic);
+}
+
+
 int main(int argc, char *argv[]) {
     /* Default options. */
     unsigned char opt_b = 0;
@@ -82,7 +100,7 @@ int main(int argc, char *argv[]) {
     /* Process passed options. */
     report_basic(path, file);
     if (!opt_b) {
-        //report_specific(file);
+        report_specific(file);
     }
 
     /* Exit. */
