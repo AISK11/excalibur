@@ -21,6 +21,7 @@ void help() {
 void report_basic(char *path, FILE *file) {
     char *name = basename(path);
     printf("   Name: %s\n", name);
+    free(name);
     unsigned long long size = wc(file);
     char *size_SI = size2human(size, SIZE_SI);
     char *size_IEC = size2human(size, SIZE_IEC);
@@ -41,21 +42,20 @@ void report_basic(char *path, FILE *file) {
 }
 
 
-/* Display specific analysis. */
-void report_specific(FILE *file) {
-    /* Print filetype. */
+/* Display filetype and execute specific analysis. */
+void report_type(FILE *file) {
+    /* Get file signature. */
     char magic[9];
     strncpy(magic, base16(file), 8);
     magic[8] = '\0';
-    char filetype[4];
 
     /* Print filetype. */
     if (strncmp(magic, "4c000000", 8) == 0) {
-        strncpy(filetype, "LNK\0", 4);
+        printf("   Type: %s (%s)\n", "LNK", magic);
+        // Analyze LNK...
     } else {
-        strncpy(filetype, "???\0", 4);
+        printf("   Type: %s (%s)\n", "???", magic);
     }
-    printf("   Type: %s (%s)\n", filetype, magic);
 }
 
 
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
     /* Process passed options. */
     report_basic(path, file);
     if (!opt_b) {
-        report_specific(file);
+        report_type(file);
     }
 
     /* Exit. */

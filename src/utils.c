@@ -1,6 +1,6 @@
 #include "utils.h"
 
-/* Strip directory and suffix from file path. */
+/* (FREE) Strip directory and suffix from file path. */
 char *basename(char *path) {
     /* Cross-platform delimeter declaration. */
     #ifdef __unix__
@@ -226,7 +226,7 @@ char *sha256sum(FILE *file) {
 }
 
 
-/* (FREE) Dump file in hexadecimal (base16) format. */
+/* (FREE) Dump file in base16 (hexadecimal) format. */
 char *base16(FILE *file){
     /* Get file size. */
     fseek(file, 0, SEEK_END);
