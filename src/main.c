@@ -1,6 +1,7 @@
-#include "utils.h"
 #include <getopt.h>
 #include <sys/stat.h>
+#include "utils.h"
+#include "files/lnk.h"
 
 void help() {
     puts("NAME");
@@ -44,18 +45,24 @@ void report_basic(char *path, FILE *file) {
 
 /* Display filetype and execute specific analysis. */
 void report_type(FILE *file) {
+    /* Dump file. */
+    char *hexdump = base16(file);
+
     /* Get file signature. */
     char magic[9];
-    strncpy(magic, base16(file), 8);
+    strncpy(magic, hexdump, 8);
     magic[8] = '\0';
 
     /* Print filetype. */
-    if (strncmp(magic, "4c000000", 8) == 0) {
+    if (magic[0] == '\0') {
+        printf("   Type: %s (%s)\n", "EMPTY", magic);
+    } else if (strncmp(magic, "4c000000", 8) == 0) {
         printf("   Type: %s (%s)\n", "LNK", magic);
-        // Analyze LNK...
+        lnk(hexdump);
     } else {
         printf("   Type: %s (%s)\n", "???", magic);
     }
+    free(hexdump);
 }
 
 

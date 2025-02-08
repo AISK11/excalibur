@@ -4,7 +4,7 @@
 ENV     := SOURCE_DATE_EPOCH=0
 CFLAGS  := -std=gnu18 -Wall -Wextra -Wpedantic -Werror -pipe -O2 -s
 LDFLAGS := -lm
-SOURCES := $(wildcard src/*.c) $(wildcard src/WjCryptLib/*.c)
+SOURCES := $(wildcard src/*.c) $(wildcard src/files/*.c) $(wildcard src/WjCryptLib/*.c)
 
 all: linux windows
 
